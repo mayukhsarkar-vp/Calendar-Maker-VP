@@ -1,0 +1,1286 @@
+"
+
+EN
+1
+
+Raven
+1st
+
+
+
+
+Website Arena
+Wanna try again?
+
+
+
+
+
++ more
+
+
+
+Qwen3.5 397B A17B
+2nd
+
+
+
+Kimi K2.5 (Thinking)
+3rd
+
+
+
+DeepSeek-V3.2
+4th
+
+
+
+
+Raven
+
+Preview
+Code
+index.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velvet Pages • Calendar Maker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&amp;family=Inter:wght@400;500;600&amp;display=swap');
+        
+        :root {
+            --velvet: #6b1e3a;
+        }
+        
+        .tail-container {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .heading-font {
+            font-family: 'Playfair Display', sans-serif;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+            background: #3f3f46;
+            padding: 2px;
+            border-radius: 12px;
+        }
+        
+        .calendar-day {
+            background: #18181b;
+            height: 110px;
+            padding: 8px;
+            font-size: 13px;
+            position: relative;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .calendar-day:hover {
+            background: #27272a;
+            transform: scale(1.03);
+        }
+        
+        .calendar-day-header {
+            font-size: 10px;
+            font-weight: 600;
+            color: #a1a1aa;
+            text-transform: uppercase;
+        }
+        
+        .calendar-day-number {
+            font-weight: 600;
+            color: #e4e4e7;
+        }
+        
+        .event-dot {
+            width: 6px;
+            height: 6px;
+            background: #f43f5e;
+            border-radius: 50%;
+        }
+        
+        .preview-frame {
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4);
+            border: 12px solid #3f3f46;
+            border-radius: 20px;
+            background: white;
+            overflow: hidden;
+        }
+        
+        .mandala-bg {
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(107, 30, 58, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(234, 179, 8, 0.15) 0%, transparent 50%);
+        }
+        
+        .nav-link {
+            position: relative;
+        }
+        
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: #eab308;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover:after {
+            width: 100%;
+        }
+        
+        .tool-tab {
+            transition: all 0.3s ease;
+        }
+        
+        .tool-tab.active {
+            border-bottom: 3px solid #eab308;
+            color: #eab308;
+        }
+        
+        .day-cell {
+            transition: all 0.2s ease;
+        }
+    </style>
+</head>
+<body class="tail-container bg-zinc-950 text-zinc-200 overflow-x-hidden">
+    <!-- NAVBAR -->
+    <nav class="bg-black border-b border-zinc-800 py-5 fixed w-full z-50">
+        <div class="max-w-screen-2xl mx-auto px-8">
+            <div class="flex items-center justify-between">
+                <!-- LOGO -->
+                <div class="flex items-center gap-x-3">
+                    <div class="w-9 h-9 bg-gradient-to-br from-rose-700 to-amber-400 rounded-2xl flex items-center justify-center shadow-inner">
+                        <span class="text-white text-3xl leading-none mt-0.5">✧</span>
+                    </div>
+                    <div>
+                        <span class="heading-font text-3xl font-bold tracking-tighter text-white">velvet</span>
+                        <span class="heading-font text-3xl font-light tracking-tighter text-amber-300">pages</span>
+                    </div>
+                </div>
+                
+                <div class="hidden md:flex items-center gap-x-8 text-sm font-medium">
+                    <a href="#" onclick="navigateTo('builder')" class="nav-link text-white hover:text-amber-300">Creator</a>
+                    <a href="#" onclick="navigateTo('templates')" class="nav-link text-white hover:text-amber-300">Templates</a>
+                    <a href="#" onclick="navigateTo('gallery')" class="nav-link text-white hover:text-amber-300">Gallery</a>
+                    <a href="#" onclick="navigateTo('about')" class="nav-link text-white hover:text-amber-300">About</a>
+                </div>
+                
+                <div class="flex items-center gap-x-4">
+                    <button onclick="toggleLogin()" 
+                            class="px-6 py-2.5 text-sm font-semibold border border-zinc-700 hover:border-amber-300 rounded-3xl transition-colors">
+                        Sign in
+                    </button>
+                    <button onclick="startCreating()" 
+                            class="px-8 py-2.5 bg-white text-black font-semibold rounded-3xl hover:bg-amber-300 transition-all flex items-center gap-x-2 shadow-lg shadow-amber-500/30">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>Start Creating</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <header class="pt-24 pb-16 bg-gradient-to-br from-zinc-900 via-rose-950 to-zinc-900 relative overflow-hidden">
+        <div class="max-w-screen-2xl mx-auto px-8 grid md:grid-cols-2 gap-16 items-center">
+            <div class="pt-12">
+                <div class="inline-flex items-center gap-x-2 bg-white/10 backdrop-blur-md px-5 py-2 rounded-3xl text-xs font-medium mb-6 border border-white/20">
+                    <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                    BY MAYUKH SARKAR • VELVET PAGES
+                </div>
+                
+                <h1 class="heading-font text-7xl md:text-8xl font-bold leading-none tracking-tighter text-white mb-4">
+                    DESIGN YOUR<br>OWN CALENDAR
+                </h1>
+                <p class="text-2xl text-zinc-400 max-w-md">
+                    Turn every month into a masterpiece. 
+                    Advanced tools, elegant templates, and velvet touch.
+                </p>
+                
+                <div class="flex items-center gap-x-4 mt-10">
+                    <button onclick="startCreating()" 
+                            class="px-10 py-6 bg-gradient-to-r from-amber-400 to-yellow-400 text-black font-bold text-xl rounded-3xl hover:scale-105 active:scale-95 transition-all flex items-center gap-x-3 shadow-2xl shadow-amber-500/40">
+                        <span>CREATE NOW</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    
+                    <button onclick="watchDemo()" 
+                            class="px-8 py-6 border border-white/30 hover:border-white/70 rounded-3xl font-medium flex items-center gap-x-3 transition-colors">
+                        <i class="fa-solid fa-play text-rose-400"></i>
+                        <span>Watch 1:42 demo</span>
+                    </button>
+                </div>
+                
+                <div class="mt-16 flex items-center gap-x-8 text-xs">
+                    <div class="flex items-center">
+                        <div class="flex -space-x-4">
+                            <div class="w-6 h-6 bg-zinc-300 rounded-2xl border-2 border-zinc-900 overflow-hidden">
+                                <img src="https://picsum.photos/id/64/64/64" alt="" class="w-full h-full object-cover">
+                            </div>
+                            <div class="w-6 h-6 bg-zinc-300 rounded-2xl border-2 border-zinc-900 overflow-hidden">
+                                <img src="https://picsum.photos/id/201/64/64" alt="" class="w-full h-full object-cover">
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex text-amber-400 text-lg">★★★★★</div>
+                        <p class="text-zinc-400 text-sm">Used by 12,459 creators this month</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- HERO PREVIEW -->
+            <div class="relative">
+                <div class="preview-frame bg-white p-3 w-full max-w-md mx-auto">
+                    <div id="hero-calendar" class="mandala-bg bg-zinc-100 h-96 rounded-2xl p-6 flex flex-col">
+                        <!-- Mini calendar preview populated by JS -->
+                        <div class="flex justify-between items-start mb-8">
+                            <div>
+                                <div class="text-xs tracking-widest text-rose-500 font-medium">DECEMBER 2025</div>
+                                <div class="heading-font text-5xl text-zinc-800 font-semibold tracking-tighter">25</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-amber-400">
+                                    <i class="fa-solid fa-leaf text-3xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex-1 grid grid-cols-7 gap-px text-[10px] text-zinc-500">
+                            <!-- Populated by script -->
+                        </div>
+                        
+                        <div class="mt-auto pt-6 border-t border-white/30 text-xs flex justify-between items-center text-zinc-400">
+                            <div>Velvet Pages</div>
+                            <div class="flex items-center gap-x-1">
+                                <span class="block w-3 h-px bg-amber-300"></span>
+                                MADE FOR YOU
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Floating badges -->
+                <div class="absolute -top-4 -left-4 bg-zinc-900 border border-amber-300 text-amber-300 text-xs px-4 py-2 rounded-3xl flex items-center gap-x-2 shadow-xl">
+                    <i class="fa-solid fa-image"></i>
+                    <span>Custom images</span>
+                </div>
+                
+                <div class="absolute -bottom-6 right-8 bg-zinc-900 border border-rose-300 text-rose-300 text-xs px-5 py-3 rounded-3xl flex items-center gap-x-2 shadow-2xl rotate-6">
+                    <i class="fa-solid fa-gift"></i>
+                    <span>Events &amp; birthdays</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SCROLL INDICATOR -->
+        <div class="absolute bottom-8 left-1/2 flex flex-col items-center text-xs tracking-widest">
+            <div class="animate-bounce">SCROLL FOR MAGIC</div>
+            <i class="fa-solid fa-chevron-down mt-2"></i>
+        </div>
+        
+        <!-- DECORATIVE -->
+        <div class="absolute top-12 right-12 text-[180px] opacity-5 pointer-events-none">🗓️</div>
+    </header>
+
+    <!-- BUILDER SECTION -->
+    <section id="builder-section" class="max-w-screen-2xl mx-auto px-8 py-12">
+        <div class="flex items-center justify-between mb-8">
+            <div class="flex items-center gap-x-3">
+                <h2 class="heading-font text-5xl font-semibold tracking-tighter">Calendar Studio</h2>
+                <div class="px-4 py-1 text-xs bg-emerald-900 text-emerald-300 rounded-3xl flex items-center gap-x-2">
+                    <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                    LIVE PREVIEW
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-x-6 text-sm">
+                <!-- YEAR SELECT -->
+                <div class="flex items-center gap-x-2 bg-zinc-900 border border-zinc-700 rounded-3xl px-5 py-2">
+                    <i class="fa-solid fa-calendar text-amber-400"></i>
+                    <select id="year-select" onchange="changeYear()" 
+                            class="bg-transparent outline-none font-mono text-lg">
+                        <!-- populated by JS -->
+                    </select>
+                </div>
+                
+                <!-- MONTH SELECT -->
+                <div class="flex items-center gap-x-2 bg-zinc-900 border border-zinc-700 rounded-3xl px-5 py-2">
+                    <select id="month-select" onchange="changeMonth()" 
+                            class="bg-transparent outline-none text-base font-medium">
+                        <!-- populated by JS -->
+                    </select>
+                </div>
+                
+                <button onclick="applyToAllMonths()" 
+                        class="flex items-center gap-x-2 px-6 py-3 bg-zinc-800 hover:bg-zinc-700 transition-colors rounded-3xl text-sm">
+                    <i class="fa-solid fa-copy"></i>
+                    <span>Apply theme to all</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-12 gap-6">
+            
+            <!-- LEFT TOOLBAR -->
+            <div class="col-span-12 lg:col-span-2 bg-zinc-900 rounded-3xl p-5 h-fit">
+                <div class="flex border-b border-zinc-700 pb-4 mb-4">
+                    <button onclick="switchToolTab(0)" id="tab-0"
+                            class="tool-tab active flex-1 py-3 text-center text-sm font-medium">Design</button>
+                    <button onclick="switchToolTab(1)" id="tab-1"
+                            class="tool-tab flex-1 py-3 text-center text-sm font-medium">Elements</button>
+                    <button onclick="switchToolTab(2)" id="tab-2"
+                            class="tool-tab flex-1 py-3 text-center text-sm font-medium">Events</button>
+                </div>
+                
+                <!-- DESIGN PANEL -->
+                <div id="panel-design" class="tool-panel">
+                    <div class="mb-6">
+                        <label class="block text-xs uppercase tracking-widest text-zinc-400 mb-3">Background</label>
+                        
+                        <!-- COLOR PICKERS -->
+                        <div class="grid grid-cols-5 gap-3 mb-6">
+                            <div onclick="setBackgroundColor('#18181b')" class="h-10 rounded-2xl bg-zinc-900 border-2 border-white cursor-pointer"></div>
+                            <div onclick="setBackgroundColor('#4c1d95')" class="h-10 rounded-2xl bg-violet-900 border-2 border-white cursor-pointer"></div>
+                            <div onclick="setBackgroundColor('#9f1239')" class="h-10 rounded-2xl bg-rose-800 border-2 border-white cursor-pointer"></div>
+                            <div onclick="setBackgroundColor('#854d0e')" class="h-10 rounded-2xl bg-amber-800 border-2 border-white cursor-pointer"></div>
+                            <div onclick="setBackgroundColor('#166534')" class="h-10 rounded-2xl bg-emerald-800 border-2 border-white cursor-pointer"></div>
+                        </div>
+                        
+                        <!-- GRADIENT OPTIONS -->
+                        <div class="text-xs uppercase tracking-widest text-zinc-400 mb-2">Gradients</div>
+                        <div class="flex gap-2">
+                            <button onclick="setGradient(0)" 
+                                    class="flex-1 h-9 bg-gradient-to-br from-rose-400 to-violet-500 rounded-2xl"></button>
+                            <button onclick="setGradient(1)" 
+                                    class="flex-1 h-9 bg-gradient-to-br from-amber-300 to-yellow-500 rounded-2xl"></button>
+                            <button onclick="setGradient(2)" 
+                                    class="flex-1 h-9 bg-gradient-to-br from-sky-400 to-indigo-500 rounded-2xl"></button>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs uppercase tracking-widest text-zinc-400 mb-3">Background Image</label>
+                        <div class="border border-dashed border-zinc-600 rounded-3xl p-8 text-center cursor-pointer hover:border-amber-300 transition-colors"
+                             onclick="document.getElementById('bg-upload').click()">
+                            <i class="fa-solid fa-cloud-arrow-up text-3xl mb-3 text-zinc-400"></i>
+                            <p class="text-xs text-zinc-400">Upload image</p>
+                            <input type="file" id="bg-upload" class="hidden" accept="image/*" onchange="handleImageUpload(event)">
+                        </div>
+                    </div>
+                    
+                    <!-- THEME PRESETS -->
+                    <div class="mt-8">
+                        <label class="block text-xs uppercase tracking-widest text-zinc-400 mb-3">Theme Presets</label>
+                        <div class="space-y-3">
+                            <div onclick="loadPreset(0)" class="flex gap-3 items-center bg-zinc-800 hover:bg-zinc-700 transition-colors p-3 rounded-2xl cursor-pointer">
+                                <div class="w-10 h-10 bg-[url('https://picsum.photos/id/1015/80/80')] bg-cover rounded-xl"></div>
+                                <div>
+                                    <div class="text-sm">Mandala Dreams</div>
+                                    <div class="text-xs text-zinc-500">Floral • Gold</div>
+                                </div>
+                            </div>
+                            <div onclick="loadPreset(1)" class="flex gap-3 items-center bg-zinc-800 hover:bg-zinc-700 transition-colors p-3 rounded-2xl cursor-pointer">
+                                <div class="w-10 h-10 bg-[url('https://picsum.photos/id/201/80/80')] bg-cover rounded-xl"></div>
+                                <div>
+                                    <div class="text-sm">Minimal Luxe</div>
+                                    <div class="text-xs text-zinc-500">Black • White</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ELEMENTS PANEL -->
+                <div id="panel-elements" class="tool-panel hidden">
+                    <div onclick="addTextOverlay()" 
+                         class="flex items-center gap-x-4 p-4 hover:bg-zinc-800 rounded-2xl cursor-pointer transition-colors">
+                        <i class="fa-solid fa-font text-xl w-8"></i>
+                        <div>
+                            <div class="text-base">Add heading text</div>
+                            <div class="text-xs text-zinc-400">Month title or quote</div>
+                        </div>
+                    </div>
+                    
+                    <div onclick="addMandalaDecoration()" 
+                         class="flex items-center gap-x-4 p-4 hover:bg-zinc-800 rounded-2xl cursor-pointer transition-colors">
+                        <i class="fa-solid fa-sun text-xl w-8"></i>
+                        <div>
+                            <div class="text-base">Mandala corner</div>
+                            <div class="text-xs text-zinc-400">Add decorative motif</div>
+                        </div>
+                    </div>
+                    
+                    <div onclick="toggleBorders()" 
+                         class="flex items-center gap-x-4 p-4 hover:bg-zinc-800 rounded-2xl cursor-pointer transition-colors">
+                        <i class="fa-solid fa-border-all text-xl w-8"></i>
+                        <div>
+                            <div class="text-base">Toggle ornate borders</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- EVENTS PANEL -->
+                <div id="panel-events" class="tool-panel hidden">
+                    <div class="text-xs font-medium mb-4 flex items-center justify-between">
+                        <span>UPCOMING EVENTS</span>
+                        <button onclick="addNewEvent()" 
+                                class="text-amber-400 text-xs flex items-center gap-x-1">
+                            <i class="fa-solid fa-plus"></i> ADD
+                        </button>
+                    </div>
+                    
+                    <div id="events-list" class="space-y-4 max-h-80 overflow-auto">
+                        <!-- JS populated -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CALENDAR PREVIEW -->
+            <div class="col-span-12 lg:col-span-7">
+                <div class="preview-frame mx-auto" style="max-width: 620px;">
+                    <div id="calendar-preview" class="bg-white text-zinc-900 p-8">
+                        <!-- HEADER -->
+                        <div class="flex justify-between items-center pb-6 border-b">
+                            <div id="calendar-header" class="flex items-center gap-x-3">
+                                <!-- JS populated -->
+                            </div>
+                            
+                            <div class="text-right">
+                                <div id="preview-month" class="heading-font text-4xl font-semibold tracking-tighter"></div>
+                                <div id="preview-year" class="text-xs tracking-[3px] text-zinc-400"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- DAYS HEADER -->
+                        <div class="grid grid-cols-7 text-center text-xs font-medium text-zinc-400 pt-6 pb-2">
+                            <div>SUN</div>
+                            <div>MON</div>
+                            <div>TUE</div>
+                            <div>WED</div>
+                            <div>THU</div>
+                            <div>FRI</div>
+                            <div>SAT</div>
+                        </div>
+                        
+                        <!-- CALENDAR GRID -->
+                        <div id="calendar-grid" class="calendar-grid">
+                            <!-- Populated by renderCalendar() -->
+                        </div>
+                        
+                        <!-- FOOTER -->
+                        <div class="pt-8 flex justify-between items-end text-xs">
+                            <div id="footer-text" class="max-w-[160px] text-zinc-400 italic">
+                                "Time is the most precious gift"
+                            </div>
+                            
+                            <div class="text-right">
+                                <div class="text-amber-400 text-[22px] leading-none">VELVET</div>
+                                <div class="text-zinc-300 text-xs">PAGES • 2025</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- OVERLAY TEXT DEMO -->
+                <div id="overlay-text" onclick="editOverlayText(this)"
+                     class="hidden absolute top-1/3 left-1/2 -translate-x-1/2 bg-black/70 text-white text-xl px-8 py-3 rounded-3xl cursor-text shadow-2xl">
+                    Your beautiful quote here
+                </div>
+            </div>
+            
+            <!-- RIGHT PANEL -->
+            <div class="col-span-12 lg:col-span-3 bg-zinc-900 rounded-3xl p-6 flex flex-col">
+                <div class="flex-1">
+                    <div class="uppercase text-xs font-semibold mb-6 tracking-widest text-center text-zinc-400">Live options</div>
+                    
+                    <!-- DAY HIGHLIGHT -->
+                    <div class="mb-8">
+                        <div class="flex justify-between text-xs mb-4">
+                            <span class="text-zinc-400">Highlight special days</span>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="highlightToday()" 
+                                    class="px-5 py-2 bg-zinc-800 hover:bg-rose-900 text-xs rounded-3xl transition-colors">Today</button>
+                            <button onclick="addBirthday(15)" 
+                                    class="px-5 py-2 bg-zinc-800 hover:bg-emerald-900 text-xs rounded-3xl transition-colors">Birthday</button>
+                            <button onclick="addAnniversary()" 
+                                    class="px-5 py-2 bg-zinc-800 hover:bg-sky-900 text-xs rounded-3xl transition-colors">Anniversary</button>
+                        </div>
+                    </div>
+                    
+                    <!-- COLOR ACCENTS -->
+                    <div>
+                        <div class="text-xs uppercase tracking-widest text-zinc-400 mb-3">Accent color</div>
+                        <div class="flex gap-4">
+                            <div onclick="changeAccent('#e11d48')" class="w-8 h-8 bg-rose-600 rounded-2xl cursor-pointer ring-2 ring-offset-2 ring-offset-zinc-900 ring-rose-300"></div>
+                            <div onclick="changeAccent('#ca8a04')" class="w-8 h-8 bg-yellow-600 rounded-2xl cursor-pointer"></div>
+                            <div onclick="changeAccent('#0ea5e9')" class="w-8 h-8 bg-sky-600 rounded-2xl cursor-pointer"></div>
+                            <div onclick="changeAccent('#10b981')" class="w-8 h-8 bg-emerald-600 rounded-2xl cursor-pointer"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- DIVIDER -->
+                    <div class="h-px bg-zinc-700 my-10"></div>
+                    
+                    <!-- TIPS -->
+                    <div class="text-[10px] leading-relaxed text-zinc-400">
+                        <div class="flex gap-x-3">
+                            <span class="font-mono text-amber-400">01</span>
+                            <span>Click any date to add personal notes</span>
+                        </div>
+                        <div class="flex gap-x-3 mt-6">
+                            <span class="font-mono text-amber-400">02</span>
+                            <span>Upload family photos as background</span>
+                        </div>
+                        <div class="flex gap-x-3 mt-6">
+                            <span class="font-mono text-amber-400">03</span>
+                            <span>Export as PDF, PNG or print-ready</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- DOWNLOAD BAR -->
+                <div class="mt-auto pt-8 border-t border-zinc-700">
+                    <button onclick="downloadMonth()" 
+                            class="w-full py-6 bg-gradient-to-r from-rose-500 to-amber-500 text-white font-bold rounded-3xl flex items-center justify-center gap-x-3 hover:brightness-110 transition">
+                        <i class="fa-solid fa-download"></i>
+                        <span>DOWNLOAD THIS MONTH</span>
+                    </button>
+                    
+                    <div class="grid grid-cols-2 gap-4 mt-4">
+                        <button onclick="downloadYear()" 
+                                class="py-5 text-sm border border-zinc-600 hover:border-zinc-400 rounded-3xl transition-colors">
+                            FULL YEAR PDF
+                        </button>
+                        <button onclick="saveProject()" 
+                                class="py-5 text-sm border border-zinc-600 hover:border-zinc-400 rounded-3xl transition-colors">
+                            SAVE PROJECT
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TEMPLATES &amp; GALLERY TEASER -->
+    <section id="templates" class="bg-black py-20">
+        <div class="max-w-screen-2xl mx-auto px-8">
+            <div class="flex justify-between items-baseline mb-12">
+                <div class="heading-font text-5xl font-medium">Beautiful templates</div>
+                <a href="#" onclick="alert('In full product you can browse 80+ templates!')" 
+                   class="flex items-center gap-x-2 text-sm group">
+                    BROWSE ALL 
+                    <span class="block transition group-hover:translate-x-2">→</span>
+                </a>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                <!-- Template cards -->
+                <div onclick="useTemplate(1)" class="group bg-zinc-900 rounded-3xl overflow-hidden cursor-pointer">
+                    <div class="h-60 bg-[url('https://picsum.photos/id/1015/600/600')] bg-cover relative">
+                        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60"></div>
+                        <div class="absolute bottom-4 left-4 text-white text-xs">MANDALA</div>
+                    </div>
+                    <div class="p-4">
+                        <div class="font-medium">Golden Mandala</div>
+                        <div class="text-xs text-zinc-400">Perfect for spiritual calendars</div>
+                    </div>
+                </div>
+                
+                <div onclick="useTemplate(2)" class="group bg-zinc-900 rounded-3xl overflow-hidden cursor-pointer">
+                    <div class="h-60 bg-[url('https://picsum.photos/id/133/600/600')] bg-cover relative">
+                        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60"></div>
+                        <div class="absolute top-4 right-4 bg-white text-black text-[10px] px-2 py-1 rounded">FAMILY</div>
+                    </div>
+                    <div class="p-4">
+                        <div class="font-medium">Family Archive</div>
+                        <div class="text-xs text-zinc-400">Photo collage ready</div>
+                    </div>
+                </div>
+                
+                <div onclick="useTemplate(3)" class="group bg-zinc-900 rounded-3xl overflow-hidden cursor-pointer">
+                    <div class="h-60 bg-zinc-800 flex items-center justify-center text-7xl">🌿</div>
+                    <div class="p-4">
+                        <div class="font-medium">Botanical</div>
+                        <div class="text-xs text-zinc-400">Nature inspired</div>
+                    </div>
+                </div>
+                
+                <div onclick="useTemplate(4)" class="group bg-zinc-900 rounded-3xl overflow-hidden cursor-pointer">
+                    <div class="h-60 bg-gradient-to-br from-purple-900 to-pink-900 flex items-center justify-center">
+                        <span class="text-6xl">✦</span>
+                    </div>
+                    <div class="p-4">
+                        <div class="font-medium">Celestial</div>
+                        <div class="text-xs text-zinc-400">Stars &amp; moons</div>
+                    </div>
+                </div>
+                
+                <div onclick="useTemplate(5)" class="group bg-zinc-900 rounded-3xl overflow-hidden cursor-pointer">
+                    <div class="h-60 bg-black flex items-center justify-center text-white text-6xl font-light">24</div>
+                    <div class="p-4">
+                        <div class="font-medium">Minimal 2025</div>
+                        <div class="text-xs text-zinc-400">Clean &amp; modern</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOUNDER MESSAGE -->
+    <section id="about" class="max-w-screen-2xl mx-auto px-8 py-20 bg-gradient-to-r from-zinc-900 to-black">
+        <div class="grid md:grid-cols-12 gap-16 items-center">
+            <div class="md:col-span-5">
+                <div class="rounded-3xl overflow-hidden border border-amber-300/30">
+                    <img src="https://picsum.photos/id/1005/800/900" alt="Mayukh Sarkar" 
+                         class="w-full h-full object-cover">
+                </div>
+            </div>
+            
+            <div class="md:col-span-7">
+                <div class="max-w-lg">
+                    <div class="uppercase text-xs text-amber-400 tracking-widest mb-3">A message from founder</div>
+                    <h2 class="heading-font text-6xl leading-none font-medium tracking-tighter">“Calendars should feel like velvet in your hands and soul.”</h2>
+                    
+                    <div class="mt-12 border-l-2 border-amber-300 pl-6">
+                        <p class="text-zinc-300 text-lg">
+                            Hi, I'm Mayukh Sarkar. After years of working with designers and watching people struggle with boring digital calendars, 
+                            I created Velvet Pages. Every pixel is crafted to feel luxurious and personal.
+                        </p>
+                        <div class="flex items-center gap-x-4 mt-8">
+                            <div class="w-12 h-px bg-amber-300"></div>
+                            <div>
+                                <div class="font-medium">Mayukh Sarkar</div>
+                                <div class="text-xs text-zinc-400">Founder, Velvet Pages</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="contactFounder()" 
+                            class="mt-16 flex items-center gap-x-6 group">
+                        <div class="w-12 h-12 flex items-center justify-center border border-white/30 group-hover:border-amber-300 rounded-2xl transition-colors">
+                            ✉️
+                        </div>
+                        <div>
+                            <div class="text-sm">Email me directly</div>
+                            <div class="text-amber-400 font-medium">mayukhsarkar1319@gmail.com</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- REVIEWS -->
+    <section class="py-20 bg-black">
+        <div class="max-w-screen-2xl mx-auto px-8">
+            <div class="text-center mb-12">
+                <span class="px-5 py-2 bg-white/5 text-white text-xs rounded-3xl">LOVED BY CREATORS</span>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Review 1 -->
+                <div class="bg-zinc-900 p-8 rounded-3xl">
+                    <div class="flex gap-x-1 text-amber-400 mb-6">★★★★☆</div>
+                    <p class="text-zinc-200">"I made a calendar for my mom with her garden photos as backgrounds. She cried when she saw it. This tool is beyond powerful."</p>
+                    <div class="mt-12 flex items-center gap-x-4">
+                        <div class="w-9 h-9 bg-purple-300 rounded-2xl"></div>
+                        <div>
+                            <div class="text-sm">Priya Sharma</div>
+                            <div class="text-xs text-zinc-400">Illustrator, India</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Review 2 -->
+                <div class="bg-zinc-900 p-8 rounded-3xl">
+                    <div class="flex gap-x-1 text-amber-400 mb-6">★★★★★</div>
+                    <p class="text-zinc-200">"The mandala designs and gradient options are insane. I printed the whole year for my yoga studio and everyone wants one now."</p>
+                    <div class="mt-12 flex items-center gap-x-4">
+                        <div class="w-9 h-9 bg-emerald-300 rounded-2xl"></div>
+                        <div>
+                            <div class="text-sm">Liam Dubois</div>
+                            <div class="text-xs text-zinc-400">Yoga instructor, France</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Review 3 -->
+                <div class="bg-zinc-900 p-8 rounded-3xl">
+                    <div class="flex gap-x-1 text-amber-400 mb-6">★★★★★</div>
+                    <p class="text-zinc-200">"Downloaded the entire year as a single PDF. The print quality is impeccable. Best $29 I've ever spent on a creative tool."</p>
+                    <div class="mt-12 flex items-center gap-x-4">
+                        <div class="w-9 h-9 bg-orange-300 rounded-2xl"></div>
+                        <div>
+                            <div class="text-sm">Sarah Patel</div>
+                            <div class="text-xs text-zinc-400">Mom &amp; photographer</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <div class="bg-gradient-to-br from-rose-900 to-amber-900 py-28 relative overflow-hidden">
+        <div class="max-w-screen-2xl mx-auto px-8 text-center">
+            <div class="max-w-xl mx-auto">
+                <span class="block text-xs text-amber-200 tracking-widest">READY TO START?</span>
+                <h2 class="heading-font text-6xl text-white leading-none tracking-tighter mt-3">Make your 2025 unforgettable</h2>
+                <button onclick="startCreating()" 
+                        class="mt-10 px-16 py-8 text-2xl font-bold bg-white text-black rounded-3xl inline-flex items-center gap-x-4 group">
+                    OPEN THE STUDIO
+                    <span class="text-4xl group-active:rotate-45 transition">🗓️</span>
+                </button>
+                <p class="mt-8 text-amber-100/70">No sign-up required for the demo. Full version unlocks unlimited downloads.</p>
+            </div>
+        </div>
+        
+        <!-- decorative calendar icons -->
+        <div class="absolute bottom-0 right-12 text-[160px] opacity-10 pointer-events-none">🗓</div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-black py-16 border-t border-zinc-900">
+        <div class="max-w-screen-2xl mx-auto px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center gap-x-6">
+                    <div class="flex items-center gap-x-3">
+                        <div class="w-7 h-7 bg-gradient-to-br from-rose-700 to-amber-400 rounded-2xl flex items-center justify-center">
+                            <span class="text-xs text-white">VP</span>
+                        </div>
+                        <span class="heading-font text-3xl">Velvet Pages</span>
+                    </div>
+                    <div class="text-xs text-zinc-500">© 2025 • Made with love and pixels</div>
+                </div>
+                
+                <div onclick="window.location='mailto:mayukhsarkar1319@gmail.com'" 
+                     class="cursor-pointer flex items-center gap-x-2 text-xs text-zinc-400 hover:text-white transition-colors">
+                    <i class="fa-solid fa-envelope"></i>
+                    <span>mayukhsarkar1319@gmail.com</span>
+                </div>
+                
+                <div class="flex gap-x-8 text-xs">
+                    <a href="#" class="hover:text-amber-300">Instagram</a>
+                    <a href="#" class="hover:text-amber-300">Pinterest</a>
+                    <a href="#" class="hover:text-amber-300">Privacy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- EVENT MODAL -->
+    <div id="event-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[999]">
+        <div class="bg-zinc-900 rounded-3xl max-w-md w-full mx-4">
+            <div class="px-8 pt-8 pb-4">
+                <div class="flex justify-between">
+                    <div class="font-medium">Add event for <span id="modal-date" class="text-amber-300"></span></div>
+                    <button onclick="closeEventModal()" class="text-zinc-400">✕</button>
+                </div>
+                
+                <input id="event-title" type="text" placeholder="Event name..." 
+                       class="block w-full mt-6 bg-zinc-800 border-0 focus:ring-amber-400 rounded-3xl py-6 px-6 outline-none">
+                
+                <div class="grid grid-cols-2 gap-4 mt-6">
+                    <div>
+                        <label class="text-xs block mb-2 text-zinc-400">Time</label>
+                        <input id="event-time" type="text" value="10:00 AM" 
+                               class="block w-full bg-zinc-800 border-0 focus:ring-amber-400 rounded-3xl py-5 px-6 outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs block mb-2 text-zinc-400">Color</label>
+                        <select id="event-color" class="block w-full bg-zinc-800 border-0 focus:ring-amber-400 rounded-3xl py-5 px-6 outline-none">
+                            <option value="#f43f5e">Rose</option>
+                            <option value="#eab308">Amber</option>
+                            <option value="#22c55e">Green</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-zinc-700 px-8 py-6 flex gap-x-4">
+                <button onclick="closeEventModal()" 
+                        class="flex-1 py-6 text-sm font-medium border border-zinc-600 rounded-3xl">Cancel</button>
+                <button onclick="saveEvent()" 
+                        class="flex-1 py-6 text-sm font-medium bg-white text-black rounded-3xl">Save to calendar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tailwind script run
+        function initializeTailwind() {
+            const script = document.createElement('script');
+            // Already included via CDN
+        }
+        
+        // Variables
+        let currentYear = 2025;
+        let currentMonth = 11; // December for demo
+        let calendarEvents = {};
+        let currentAccent = "#e11d48";
+        let backgroundImageUrl = null;
+        let overlayActive = false;
+        
+        const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+        
+        // Sample events for December
+        function initializeSampleEvents() {
+            calendarEvents = {
+                "2025-11-3": { title: "Mom's Birthday", color: "#eab308" },
+                "2025-11-12": { title: "Studio launch", color: "#f43f5e" },
+                "2025-11-25": { title: "Christmas", color: "#22c55e" }
+            };
+        }
+        
+        // Render the year select
+        function populateYearSelect() {
+            const select = document.getElementById("year-select");
+            select.innerHTML = "";
+            for (let y = 2023; y <= 2027; y++) {
+                const opt = document.createElement("option");
+                opt.value = y;
+                opt.textContent = y;
+                if (y === currentYear) opt.selected = true;
+                select.appendChild(opt);
+            }
+        }
+        
+        // Render month select
+        function populateMonthSelect() {
+            const select = document.getElementById("month-select");
+            select.innerHTML = "";
+            monthNames.forEach((name, index) => {
+                const opt = document.createElement("option");
+                opt.value = index;
+                opt.textContent = name;
+                if (index === currentMonth) opt.selected = true;
+                select.appendChild(opt);
+            });
+        }
+        
+        // Main calendar render
+        function renderCalendar() {
+            const grid = document.getElementById("calendar-grid");
+            grid.innerHTML = "";
+            
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            
+            // Weekday headers already static, but we fill dates
+            // Empty slots
+            for (let i = 0; i < firstDay; i++) {
+                const empty = document.createElement("div");
+                empty.className = "calendar-day bg-transparent";
+                grid.appendChild(empty);
+            }
+            
+            // Actual days
+            const today = new Date();
+            const isCurrentMonth = (today.getFullYear() === currentYear && today.getMonth() === currentMonth);
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayEl = document.createElement("div");
+                dayEl.className = `calendar-day day-cell flex flex-col`;
+                
+                // Day number
+                const num = document.createElement("div");
+                num.className = "calendar-day-number text-xl";
+                num.textContent = day;
+                dayEl.appendChild(num);
+                
+                // Check if has event
+                const key = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                if (calendarEvents[key]) {
+                    const eventContainer = document.createElement("div");
+                    eventContainer.className = "flex-1 flex items-end";
+                    const dot = document.createElement("div");
+                    dot.className = "event-dot";
+                    dot.style.backgroundColor = calendarEvents[key].color || "#f43f5e";
+                    eventContainer.appendChild(dot);
+                    dayEl.appendChild(eventContainer);
+                }
+                
+                // Click handler
+                dayEl.onclick = () => openEventModal(day);
+                
+                // Highlight today
+                if (isCurrentMonth && today.getDate() === day) {
+                    dayEl.style.border = "2px solid #eab308";
+                    dayEl.style.borderRadius = "8px";
+                }
+                
+                grid.appendChild(dayEl);
+            }
+            
+            // Update header texts
+            document.getElementById("preview-month").textContent = monthNames[currentMonth];
+            document.getElementById("preview-year").textContent = currentYear;
+            
+            // Update header icon area
+            const headerArea = document.getElementById("calendar-header");
+            headerArea.innerHTML = `
+                <div class="text-xs bg-zinc-100 text-zinc-500 font-medium px-5 py-3 rounded-3xl">2025</div>
+                <div onclick="prevMonth()" class="w-9 h-9 flex items-center justify-center bg-zinc-100 hover:bg-amber-100 rounded-2xl cursor-pointer transition-colors">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </div>
+            `;
+        }
+        
+        function changeYear() {
+            currentYear = parseInt(document.getElementById("year-select").value);
+            renderCalendar();
+        }
+        
+        function changeMonth() {
+            currentMonth = parseInt(document.getElementById("month-select").value);
+            renderCalendar();
+        }
+        
+        function prevMonth() {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+                document.getElementById("year-select").value = currentYear;
+            }
+            document.getElementById("month-select").value = currentMonth;
+            renderCalendar();
+        }
+        
+        // Tool tabs
+        function switchToolTab(n) {
+            // Deactivate all
+            for (let i = 0; i < 3; i++) {
+                const tab = document.getElementById("tab-" + i);
+                if (tab) tab.classList.remove("active");
+            }
+            
+            // Activate
+            document.getElementById("tab-" + n).classList.add("active");
+            
+            // Panels
+            document.getElementById("panel-design").classList.add("hidden");
+            document.getElementById("panel-elements").classList.add("hidden");
+            document.getElementById("panel-events").classList.add("hidden");
+            
+            if (n === 0) document.getElementById("panel-design").classList.remove("hidden");
+            else if (n === 1) document.getElementById("panel-elements").classList.remove("hidden");
+            else if (n === 2) {
+                document.getElementById("panel-events").classList.remove("hidden");
+                renderEventsList();
+            }
+        }
+        
+        function renderEventsList() {
+            const container = document.getElementById("events-list");
+            container.innerHTML = "";
+            
+            Object.keys(calendarEvents).forEach(key => {
+                const event = calendarEvents[key];
+                const div = document.createElement("div");
+                div.className = "bg-zinc-800 px-5 py-4 rounded-2xl flex items-center";
+                div.innerHTML = `
+                    <div style="background-color: ${event.color}" class="w-3 h-3 rounded mr-4"></div>
+                    <div class="flex-1">
+                        <div class="text-sm">${event.title}</div>
+                        <div class="text-xs text-zinc-400">${key}</div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+            
+            if (Object.keys(calendarEvents).length === 0) {
+                container.innerHTML = `<div class="text-xs opacity-40 text-center py-6">No events yet</div>`;
+            }
+        }
+        
+        // Background
+        function setBackgroundColor(hex) {
+            const preview = document.getElementById("calendar-preview");
+            preview.style.background = hex;
+            preview.style.color = (hex === "#18181b" || hex === "#4c1d95") ? "#f4f4f5" : "#18181b";
+        }
+        
+        function setGradient(n) {
+            const preview = document.getElementById("calendar-preview");
+            if (n === 0) {
+                preview.style.background = "linear-gradient(135deg, #9f1239, #4c1d95)";
+            } else if (n === 1) {
+                preview.style.background = "linear-gradient(135deg, #854d0e, #f59e0b)";
+            } else if (n === 2) {
+                preview.style.background = "linear-gradient(135deg, #1e3a8a, #3b82f6)";
+            }
+        }
+        
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                backgroundImageUrl = ev.target.result;
+                const preview = document.getElementById("calendar-preview");
+                preview.style.backgroundImage = `url('${backgroundImageUrl}')`;
+                preview.style.backgroundSize = "cover";
+                preview.style.backgroundPosition = "center";
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function loadPreset(n) {
+            const preview = document.getElementById("calendar-preview");
+            if (n === 0) {
+                // Mandala
+                preview.style.background = "radial-gradient(circle, #4c1d95 10%, #9f1239 90%)";
+                document.getElementById("footer-text").innerHTML = `ॐ • Harmony`;
+            } else if (n === 1) {
+                preview.style.background = "#111113";
+                preview.style.color = "#fafafa";
+                document.getElementById("footer-text").innerHTML = `Less is more`;
+            }
+            renderCalendar();
+        }
+        
+        // Add text overlay
+        function addTextOverlay() {
+            const overlay = document.getElementById("overlay-text");
+            overlay.classList.remove("hidden");
+            overlay.style.top = "26%";
+            overlay.textContent = "Family first • 2025";
+            overlayActive = true;
+        }
+        
+        function editOverlayText(el) {
+            const newText = prompt("Edit overlay text:", el.textContent);
+            if (newText !== null) el.textContent = newText;
+        }
+        
+        function addMandalaDecoration() {
+            alert("Mandala decoration added to corners! (demo)");
+            // Could add SVG elements in real implementation
+        }
+        
+        function toggleBorders() {
+            const grid = document.getElementById("calendar-grid");
+            if (grid.style.borderColor === "rgb(234, 179, 8)") {
+                grid.style.borderColor = "#3f3f46";
+            } else {
+                grid.style.borderColor = "#eab308";
+            }
+        }
+        
+        // Event modal
+        let selectedDay = null;
+        
+        function openEventModal(day) {
+            selectedDay = day;
+            const modal = document.getElementById("event-modal");
+            modal.classList.remove("hidden");
+            document.getElementById("modal-date").textContent = `${monthNames[currentMonth]} ${day}, ${currentYear}`;
+            document.getElementById("event-title").focus();
+        }
+        
+        function closeEventModal() {
+            document.getElementById("event-modal").classList.add("hidden");
+        }
+        
+        function saveEvent() {
+            if (!selectedDay) return;
+            
+            const title = document.getElementById("event-title").value || "Untitled event";
+            const key = `${currentYear}-${String(currentMonth+1).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`;
+            
+            calendarEvents[key] = {
+                title: title,
+                color: document.getElementById("event-color").value
+            };
+            
+            closeEventModal();
+            renderCalendar();
+            renderEventsList();
+        }
+        
+        function addNewEvent() {
+            // Add to current month randomly
+            const randomDay = Math.floor(Math.random() * 25) + 5;
+            const key = `${currentYear}-${String(currentMonth+1).padStart(2, '0')}-${String(randomDay).padStart(2, '0')}`;
+            calendarEvents[key] = {
+                title: "New milestone",
+                color: "#eab308"
+            };
+            renderCalendar();
+            renderEventsList();
+        }
+        
+        // Highlight demo
+        function highlightToday() {
+            alert("Today highlighted in the preview!");
+        }
+        
+        function addBirthday(day) {
+            const key = `${currentYear}-${String(currentMonth+1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            calendarEvents[key] = {
+                title: "🎂 Birthday",
+                color: "#f43f5e"
+            };
+            renderCalendar();
+        }
+        
+        function addAnniversary() {
+            alert("Anniversary added on the 14th");
+            const key = `${currentYear}-${String(currentMonth+1).padStart(2, '0')}-14`;
+            calendarEvents[key] = {
+                title: "💍 Anniversary",
+                color: "#22c55e"
+            };
+            renderCalendar();
+        }
+        
+        function changeAccent(hex) {
+            currentAccent = hex;
+            // Could change dots etc but demo
+            renderCalendar();
+        }
+        
+        // Download mocks
+        function downloadMonth() {
+            const btns = document.querySelectorAll("button");
+            for (let btn of btns) {
+                if (btn.textContent.includes("DOWNLOAD THIS MONTH")) {
+                    const original = btn.innerHTML;
+                    btn.style.transition = "all .4s";
+                    btn.innerHTML = `✓ DOWNLOADED`;
+                    setTimeout(() => {
+                        btn.innerHTML = original;
+                    }, 2100);
+                    break;
+                }
+            }
+            alert("✅ December calendar downloaded as high-res PNG (demo). In real app it would trigger a full quality file.");
+        }
+        
+        function downloadYear() {
+            alert("Full year PDF ready! (12 beautiful pages).");
+        }
+        
+        function saveProject() {
+            alert("Project saved to your Velvet cloud! 🎉");
+        }
+        
+        function applyToAllMonths() {
+            alert("Theme applied across all 12 months of 2025.");
+        }
+        
+        // Navigation
+        function navigateTo(section) {
+            if (section === "builder") {
+                document.getElementById("builder-section").scrollIntoView({ behavior: "smooth" });
+            } else if (section === "templates") {
+                document.getElementById("templates").scrollIntoView({ behavior: "smooth" });
+            } else if (section === "gallery") {
+                alert("Gallery page would open here");
+            } else if (section === "about") {
+                document.getElementById("about").scrollIntoView({ behavior: "smooth" });
+            }
+        }
+        
+        function startCreating() {
+            document.getElementById("builder-section").scrollIntoView({ behavior: "smooth" });
+        }
+        
+        function watchDemo() {
+            alert("🎬 Demo video would play here.\n\nImagine beautiful transitions, drag and drop photos, and instant PDF exports.");
+        }
+        
+        function toggleLogin() {
+            alert("Welcome back! In the real product you can login to save calendars.");
+        }
+        
+        function contactFounder() {
+            window.location.href = "mailto:mayukhsarkar1319@gmail.com?subject=Hello%20from%20Velvet%20Calendar";
+        }
+        
+        function useTemplate(n) {
+            alert(`Template #${n} loaded into editor!`);
+            // Simulate load mandala
+            if (n === 1) {
+                loadPreset(0);
+            }
+            startCreating();
+        }
+        
+        // Keyboard shortcuts
+        function handleKeys(e) {
+            if (e.metaKey && e.key === "k") {
+                e.preventDefault();
+                alert("Command palette would appear (search templates, colors etc)");
+            }
+        }
+        
+        // Fake hero calendar
+        function renderHeroCalendar() {
+            // Already static but could be animated
+        }
+        
+        // Main initialization
+        function initialize() {
+            // Tailwind ready
+            populateYearSelect();
+            populateMonthSelect();
+            initializeSampleEvents();
+            renderCalendar();
+            renderEventsList();
+            
+            // Activate first tab
+            switchToolTab(0);
+            
+            // Keyboard
+            document.addEventListener("keydown", handleKeys);
+            
+            // Make hero calendar interactive too
+            const heroCal = document.getElementById("hero-calendar");
+            heroCal.style.transition = "transform 1.2s cubic-bezier(0.34,1.56,0.64,1)";
+            
+            setTimeout(() => {
+                heroCal.style.transform = "rotate(2deg) scale(1.03)";
+            }, 1200);
+            
+            setTimeout(() => {
+                heroCal.style.transform = "rotate(0deg) scale(1)";
+            }, 2400);
+            
+            // Random accent pulse
+            setInterval(() => {
+                const dots = document.querySelectorAll(".event-dot");
+                if (dots.length) {
+                    dots.forEach((dot, i) => {
+                        if (i % 3 === 0) {
+                            dot.style.transform = "scale(1.6)";
+                            setTimeout(() => dot.style.transform = "scale(1)", 340);
+                        }
+                    });
+                }
+            }, 2800);
+            
+            console.log('%cVelvet Pages Calendar Maker ready 🪄', 'color:#eab308; font-family:monospace');
+        }
+        
+        // Boot app
+        window.onload = initialize;
+    </script>
+</body>
+</html>"
+ https://designarena.ai/#:~:text=DesignArenaby%20Arcada,%3C/html%3E
